@@ -142,3 +142,40 @@ roles: [<br>
 <code>mongo newDB --host 192.168.103.100:27000 -u m103-admin -p m103-pass --authenticationDatabase admin --eval 'db.new_collection.insert( { "a": 1 } )'</code>
 <h3>Get profiling data from system.profile:</h3>
 <code>mongo newDB --host 192.168.103.100:27000 -u m103-admin -p m103-pass --authenticationDatabase admin --eval 'db.system.profile.find().pretty()'</code>
+
+<h2>Creating a new user</h2>
+<p>
+  <code>use admin
+    db.createUser({
+      user: "root",
+      pwd: "root123",
+      roles : [ "root" ]
+    })</code>
+    <h3>Login</h3>
+    <code>mongo --username root --password root123 --authenticationDatabase admin</code>
+    <p>db.stats()</p>
+    <p>use admin<br>
+      db.shutdownServer()</p>
+</p>
+
+<h2>Creating users(Best practices)</h2>
+<p>
+  <h3>Create security officer:  </h3>
+  <code>db.createUser(
+    { user: "security_officer",
+      pwd: "h3ll0th3r3",
+      roles: [ { db: "admin", role: "userAdmin" } ]
+    }
+  )</code>
+  <h3>Create database administrator:  </h3>
+  <code>db.createUser(
+    { user: "dba",
+      pwd: "c1lynd3rs",
+      roles: [ { db: "admin", role: "dbAdmin" } ]
+    }
+  )</code>
+  <h3>Grant role to user:  </h3>
+  <code>db.grantRolesToUser( "dba",  [ { db: "playground", role: "dbOwner"  } ] )</code>
+  <h3>Show role privileges:  </h3>
+  <code>db.runCommand( { rolesInfo: { role: "dbOwner", db: "playground" }, showPrivileges: true} )</code>
+</p>
