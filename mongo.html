@@ -1,5 +1,11 @@
 # mongodb
 
+<style>
+  h1{
+    background-color: lightblue;
+  }
+</style>
+
 <h1><u>mongod</u></h1>
 <h2>INTRO:</h2>
 <p>db.createCollection("employees")</p>
