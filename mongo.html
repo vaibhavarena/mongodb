@@ -1,4 +1,6 @@
 # mongodb
+
+<h1><u>mongod</u></h1>
 <h2>INTRO:</h2>
 <p>db.createCollection("employees")</p>
 
@@ -178,4 +180,92 @@ roles: [<br>
   <code>db.grantRolesToUser( "dba",  [ { db: "playground", role: "dbOwner"  } ] )</code>
   <h3>Show role privileges:  </h3>
   <code>db.runCommand( { rolesInfo: { role: "dbOwner", db: "playground" }, showPrivileges: true} )</code>
+</p>
+
+<h1><u>replication</u></h1>
+<h2>conf file for replication</h2>
+<p>
+  <code>storage:<br>
+    &nbsp;&nbsp;dbPath: /var/mongodb/db/node1<br>
+  net:<br>
+  &nbsp;&nbsp;bindIp: 192.168.103.100,localhost<br>
+  &nbsp;&nbsp; port: 27011<br>
+  security:<br>
+  &nbsp;&nbsp; authorization: enabled<br>
+  &nbsp;&nbsp;keyFile: /var/mongodb/pki/m103-keyfile<br>
+  systemLog:<br>
+  &nbsp;&nbsp;destination: file<br>
+  &nbsp;&nbsp;  path: /var/mongodb/db/node1/mongod.log<br>
+  &nbsp;&nbsp;logAppend: true<br>
+  processManagement:<br>
+  &nbsp;&nbsp;fork: true<br>
+  replication:<br>
+  &nbsp;&nbsp;replSetName: m103-example</code>
+</p>
+<h2>Creating keyfile on linux</h2>
+<p>
+<code>sudo mkdir -p /var/mongodb/pki/<br>
+  sudo chown vagrant:vagrant /var/mongodb/pki/<br>
+  openssl rand -base64 741 > /var/mongodb/pki/m103-keyfile<br>
+  chmod 400 /var/mongodb/pki/m103-keyfile</code>
+</p>
+<h3>Create db path for node 1</h3>
+<p>
+  <code>mkdir -p /var/mongodb/db/node1</code>
+  similarly create path for node 2 and node3 and modify conf file accordingly
+</p>
+
+<h3>Start all processes</h3>
+<p>
+  <code>mongod -f node1.conf</code>
+  <code>mongod -f node2.conf</code>
+<code>mongod -f node3.conf</code>
+</p>
+<h3>Connect to node 1</h3>
+<p>
+  <code>rs.initiate()</code>
+</p>
+<h3>Create user</h3>
+<p>
+  <code>use admin<br>
+    db.createUser({<br>
+      user: "m103-admin",<br>
+      pwd: "m103-pass",<br>
+      roles: [<br>
+        {role: "root", db: "admin"}<br>
+      ]<br>
+    })</code>
+</p>
+<h3>Exiting out of the Mongo shell and connecting to the entire replica set:</h3>
+<p>
+  <code>exit<br>
+    mongo --host "m103-example/192.168.103.100:27011" -u "m103-admin"
+    -p "m103-pass" --authenticationDatabase "admin"</code>
+</p>
+
+<h3>Getting replica set status:</h3>
+<p><code>rs.status()</code></p>
+
+<h3>Adding other members to replica set:</h3>
+<p>
+  <code>rs.add("m103:27012")<br>
+    rs.add("m103:27013")</code><br><br>
+    <b>If all running on localhost or same server and above doesnt work</b>
+    <code>rs.add("localhost:27002")</code>
+</p>
+<h3>Getting an overview of the replica set topology:</h3>
+<p><code>rs.isMaster()</code></p>
+
+</p>
+<h3>Stepping down the current primary:</h3>
+<p><code>rs.stepDown()</code></p>
+
+</p>
+<h3>Checking replica set overview after election:</h3>
+<p><code>rs.isMaster()</code></p>
+
+<h3>Other commands</h3>
+<p>
+  <code>db.serverStatus()['repl']</code><br>  
+  <code>rs.printReplicationInfo()</code>
 </p>
